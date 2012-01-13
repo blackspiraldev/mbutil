@@ -166,7 +166,6 @@ def disk_to_mbtiles(directory_path, mbtiles_file, **kwargs):
         logger.debug("Initial Zoom dirs: %s" % zs)
         if zoom_levels:
             zs[:] = [d for d in zs if d in zoom_levels]
-
         logger.debug("Zoom levels: %s" % zs )        
         for z in zs:
             
