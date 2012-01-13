@@ -36,6 +36,8 @@ if __name__ == '__main__':
         type='string',
         default='tms')
 
+    parser.add_option('--zoom', dest='zoom', help="Import only tiles matching this zoom level", type='string',default=None)
+
     (options, args) = parser.parse_args()
 
     # Transfer operations

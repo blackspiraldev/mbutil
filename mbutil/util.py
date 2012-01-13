@@ -126,9 +126,23 @@ def compression_finalize(cur):
     cur.execute("""vacuum;""")
     cur.execute("""analyze;""")
 
+def get_zoom_levels(zoomstring):
+    elements = zoomstring.split(',')
+    logger.debug('Zoom dirs: %s' % elements)
+    #Should do more validation?
+    return elements
+
 def disk_to_mbtiles(directory_path, mbtiles_file, **kwargs):
     logger.info("Importing disk to MBTiles")
     logger.debug("%s --> %s" % (directory_path, mbtiles_file))
+    logger.debug("kwargs= %s" % kwargs) 
+
+    if (kwargs.get('zoom')):
+        zoom_levels = get_zoom_levels(kwargs.get('zoom'))
+    else:
+        zoom_levels = None
+
+    print zoom_levels
     con = mbtiles_connect(mbtiles_file)
     cur = con.cursor()
     optimize_connection(cur)
@@ -148,8 +162,14 @@ def disk_to_mbtiles(directory_path, mbtiles_file, **kwargs):
     count = 0
     start_time = time.time()
     msg = ""
-    for r1, zs, ignore in os.walk(directory_path):
+    for r1, zs, ignore in os.walk(directory_path, topdown=True):
+        logger.debug("Initial Zoom dirs: %s" % zs)
+        if zoom_levels:
+            zs[:] = [d for d in zs if d in zoom_levels]
+
+        logger.debug("Zoom levels: %s" % zs )        
         for z in zs:
+            
             for r2, xs, ignore in os.walk(os.path.join(r1, z)):
                 for x in xs:
                     for r2, ignore, ys in os.walk(os.path.join(r1, z, x)):
